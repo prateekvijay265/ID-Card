@@ -83,7 +83,6 @@ export default function IdCard({ data, userPhoto }: IdCardProps) {
           <img
             src={userPhoto}
             alt="Builder"
-            crossOrigin="anonymous"
             style={{
               display: 'block',
               width: '100%',
@@ -102,7 +101,6 @@ export default function IdCard({ data, userPhoto }: IdCardProps) {
       <img
         src={TEMPLATE}
         alt=""
-        crossOrigin="anonymous"
         style={{
           position: 'absolute',
           inset: 0,
