@@ -85,8 +85,15 @@ export default function Generator() {
         setStatus({ text: 'Converting HEIC...', ok: true });
         blob = await convertHEIC(file);
       }
-      const url = URL.createObjectURL(blob);
-      setPhotoSrc(url); setPhotoName(file.name); loadImg(url); setStatus(null);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
+        setPhotoSrc(dataUrl); setPhotoName(file.name); loadImg(dataUrl); setStatus(null);
+      };
+      reader.onerror = () => {
+        setStatus({ text: 'Failed to read image.', ok: false });
+      };
+      reader.readAsDataURL(blob);
     } catch { setStatus({ text: 'Failed. Try JPG or PNG.', ok: false }); }
     finally { setIsConverting(false); }
   }, [loadImg]);
@@ -147,10 +154,7 @@ export default function Generator() {
   const shareX = () => {
     const txt = encodeURIComponent(`Just got my HH Goa 2026 builder card! 🌴\n\nShipping in paradise this Oct. See you there 👀\n\n#FrameInGoa #HackerHouseGoa`);
     const url = `https://twitter.com/intent/tweet?text=${txt}`;
-    const newWindow = window.open(url, '_blank', 'noopener');
-    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-      window.location.href = url;
-    }
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const hasPhoto = !!userImg;
