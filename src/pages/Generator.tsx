@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect, ChangeEvent } from 'react';
+import { useState, useRef, useCallback, useEffect, type ChangeEvent } from 'react';
 import * as htmlToImage from 'html-to-image';
 import PageTransition from '../components/PageTransition';
 import IdCard from '../components/IdCard';
@@ -8,7 +8,6 @@ import {
   type Format,
   type CardData,
 } from '../canvasRenderer';
-import { getRandTitle } from '../data';
 
 export type { CardData };
 
@@ -96,9 +95,13 @@ export default function Generator() {
   const onDrop = (e: React.DragEvent) => { e.preventDefault(); setIsDragOver(false); const f = e.dataTransfer.files?.[0]; if (f) handleFile(f); };
 
   const download = async () => {
+    setStatus({ text: 'Generating...', ok: true });
     if (format === 'card') {
       const node = document.getElementById('id-card-node');
-      if (!node) return;
+      if (!node) {
+        setStatus({ text: 'Error: Card not found', ok: false });
+        return;
+      }
       try {
         // Need to temporarily unscale it for export
         const oldTransform = node.style.transform;
@@ -115,24 +118,33 @@ export default function Generator() {
         
         const a = document.createElement('a');
         a.download = 'hh-goa-card.png';
-        a.href = dataUrl; a.click();
+        a.href = dataUrl;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
       } catch (err) {
         console.error("Export failed", err);
+        setStatus({ text: 'Export failed. Please try again.', ok: false });
+        return;
       }
     } else {
-      const c = canvasRef.current; if (!c) return;
+      const c = canvasRef.current; 
+      if (!c) {
+        setStatus({ text: 'Error: Canvas not found', ok: false });
+        return;
+      }
       const a = document.createElement('a');
       a.download = 'hh-goa-pfp.png';
-      a.href = c.toDataURL('image/png'); a.click();
+      a.href = c.toDataURL('image/png');
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
     setStatus({ text: '✓ Downloaded', ok: true });
     setTimeout(() => setStatus(null), 3000);
   };
 
-  const shareX = () => {
-    const txt = encodeURIComponent(`Just got my HH Goa 2026 builder card! 🌴\n\nShipping in paradise this Oct. See you there 👀\n\n#FrameInGoa #HackerHouseGoa`);
-    window.open(`https://twitter.com/intent/tweet?text=${txt}`, '_blank', 'noopener');
-  };
+  const shareHref = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just got my HH Goa 2026 builder card! 🌴\n\nShipping in paradise this Oct. See you there 👀\n\n#FrameInGoa #HackerHouseGoa`)}`;
 
   const hasPhoto = !!userImg;
   const sz = CANVAS_SIZES[format];
@@ -244,8 +256,13 @@ export default function Generator() {
 
           <div className="gen-actions">
             <button className="btn btn-primary" onClick={download} disabled={format === 'pfp' && !hasPhoto}>↓ Download</button>
-            <button className="btn btn-pink" onClick={shareX}>Share to X</button>
+            <a className="btn btn-pink" href={shareHref} target="_blank" rel="noopener">Share to X</a>
           </div>
+          {status && (
+            <div style={{ textAlign: 'center', paddingBottom: 20, color: status.ok ? 'var(--yellow)' : 'var(--pink)', fontWeight: 'bold' }}>
+              {status.text}
+            </div>
+          )}
         </section>
       </div>
     </PageTransition>

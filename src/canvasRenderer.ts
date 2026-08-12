@@ -73,11 +73,6 @@ export function drawPFP(
   ctx.fillStyle = '#0F3820'; // Matching green just in case
   ctx.fillRect(0, 0, W, H);
 
-  const cx = 540;
-  const cy = 480; // Adjusted center Y to stop above the HACKER text
-  const rx = 329; // Exact X radius
-  const ry = 269; // Adjusted Y radius so it doesn't cut into the HACKER text
-
   if (bgImg && userImg) {
     // 1. Draw the user photo FIRST (behind the frame)
     // Draw it large enough (750x750) to fully cover the transparent hole and bleed safely behind the HACKER HOUSE badge
@@ -271,7 +266,7 @@ export async function drawCard(
   ctx.fill();
   ctx.fillStyle = C.white;
   ctx.font = 'bold 28px "Space Mono", monospace';
-  ctx.fillText((data.role || 'FULL STACK DEVELOPER').toUpperCase(), rx + 240, ry + 25);
+  ctx.fillText((data.stackRoleList || 'FULL STACK DEVELOPER').toUpperCase(), rx + 240, ry + 25);
 
   // 5. 3-Column Info Grid
   ry += 90;
@@ -344,7 +339,7 @@ export async function drawCard(
 
   ctx.fillStyle = C.orange;
   ctx.font = 'bold 20px "Space Mono"';
-  const sTitle = data.shipping || 'BUILDING THE FUTURE';
+  const sTitle = data.builderSubtext || 'BUILDING THE FUTURE';
   const sWords = sTitle.split(' ');
   let l1 = sWords.slice(0, 2).join(' ');
   let l2 = sWords.slice(2).join(' ');
