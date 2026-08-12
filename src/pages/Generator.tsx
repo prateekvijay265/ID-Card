@@ -144,7 +144,14 @@ export default function Generator() {
     setTimeout(() => setStatus(null), 3000);
   };
 
-  const shareHref = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just got my HH Goa 2026 builder card! 🌴\n\nShipping in paradise this Oct. See you there 👀\n\n#FrameInGoa #HackerHouseGoa`)}`;
+  const shareX = () => {
+    const txt = encodeURIComponent(`Just got my HH Goa 2026 builder card! 🌴\n\nShipping in paradise this Oct. See you there 👀\n\n#FrameInGoa #HackerHouseGoa`);
+    const url = `https://twitter.com/intent/tweet?text=${txt}`;
+    const newWindow = window.open(url, '_blank', 'noopener');
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      window.location.href = url;
+    }
+  };
 
   const hasPhoto = !!userImg;
   const sz = CANVAS_SIZES[format];
@@ -256,7 +263,7 @@ export default function Generator() {
 
           <div className="gen-actions">
             <button className="btn btn-primary" onClick={download} disabled={format === 'pfp' && !hasPhoto}>↓ Download</button>
-            <a className="btn btn-pink" href={shareHref} target="_blank" rel="noopener">Share to X</a>
+            <button className="btn btn-pink" onClick={shareX}>Share to X</button>
           </div>
           {status && (
             <div style={{ textAlign: 'center', paddingBottom: 20, color: status.ok ? 'var(--yellow)' : 'var(--pink)', fontWeight: 'bold' }}>
